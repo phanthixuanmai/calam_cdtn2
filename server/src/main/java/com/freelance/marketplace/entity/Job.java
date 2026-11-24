@@ -24,7 +24,11 @@ public class Job {
 
     private String salaryRange;
 
+    private String workSchedule;
+
     private JobStatus status = JobStatus.OPEN;
+
+    private WorkStage workStage;
 
     private User employer;
 
@@ -73,6 +77,21 @@ public class Job {
     public void setSalaryRange(String salaryRange) { this.salaryRange = salaryRange; }
     public JobStatus getStatus() { return status; }
     public void setStatus(JobStatus status) { this.status = status; }
+    public WorkStage getWorkStage() {
+        if (workStage != null) {
+            return workStage;
+        }
+        if (status == JobStatus.COMPLETED) {
+            return WorkStage.COMPLETED;
+        }
+        if (status == JobStatus.FILLED) {
+            return WorkStage.HIRED;
+        }
+        return WorkStage.RECRUITING;
+    }
+    public void setWorkStage(WorkStage workStage) { this.workStage = workStage; }
+    public String getWorkSchedule() { return workSchedule; }
+    public void setWorkSchedule(String workSchedule) { this.workSchedule = workSchedule; }
     public User getEmployer() { return employer; }
     public void setEmployer(User employer) { this.employer = employer; }
     public LocalDateTime getStartDate() { return startDate; }

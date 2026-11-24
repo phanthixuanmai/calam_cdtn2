@@ -10,6 +10,7 @@ import com.freelance.marketplace.exception.ResourceNotFoundException;
 import com.freelance.marketplace.repository.EmployerProfileRepository;
 import com.freelance.marketplace.repository.StudentProfileRepository;
 import com.freelance.marketplace.repository.UserRepository;
+import com.freelance.marketplace.util.AvailabilityMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,9 @@ public class UserService {
             profile.put("address", profileEntity != null ? profileEntity.getAddress() : "");
             profile.put("cvUrl", profileEntity != null ? profileEntity.getCvUrl() : "");
             profile.put("skills", profileEntity != null ? profileEntity.getSkills() : "");
+            profile.put("availability", profileEntity != null && profileEntity.getAvailability() != null
+                    ? profileEntity.getAvailability()
+                    : java.util.List.of());
         }
 
         if (user.getRole() == Role.EMPLOYER) {
@@ -74,6 +78,9 @@ public class UserService {
 
     public User updateProfile(UpdateProfileRequest request) {
         User user = getCurrentUser();
+        if (request.name() != null && request.name().isBlank()) {
+            throw new BadRequestException("Họ và tên không được để trống");
+        }
         if (request.name() != null && !request.name().isBlank()) {
             user.setName(request.name());
         }
@@ -91,8 +98,11 @@ public class UserService {
             if (request.address() != null) profile.setAddress(request.address());
             if (request.skills() != null) profile.setSkills(request.skills());
             if (request.cvUrl() != null) profile.setCvUrl(request.cvUrl());
+            if (request.availability() != null) {
+                profile.setAvailability(AvailabilityMapper.toEntities(request.availability()));
+            }
             user.setStudentProfile(profile);
-            studentProfileRepository.save(profile);
+            user.setStudentProfile(studentProfileRepository.save(profile));
         }
 
         if (user.getRole() == Role.EMPLOYER) {
@@ -105,7 +115,7 @@ public class UserService {
             if (request.website() != null) profile.setWebsite(request.website());
             if (request.location() != null) profile.setLocation(request.location());
             user.setEmployerProfile(profile);
-            employerProfileRepository.save(profile);
+            user.setEmployerProfile(employerProfileRepository.save(profile));
         }
 
         return userRepository.save(user);

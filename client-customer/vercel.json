@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://marketplace-freelance-parttime.onrender.com/api/$1"
+    }
+  ]
+}

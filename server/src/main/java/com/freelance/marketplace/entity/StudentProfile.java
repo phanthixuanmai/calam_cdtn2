@@ -3,6 +3,9 @@ package com.freelance.marketplace.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Document(collection = "student_profiles")
 public class StudentProfile {
 
@@ -16,6 +19,8 @@ public class StudentProfile {
     private String cvUrl;
 
     private String skills;
+
+    private List<AvailabilitySlot> availability = new ArrayList<>();
 
     public StudentProfile() {
     }
@@ -38,4 +43,6 @@ public class StudentProfile {
     public void setCvUrl(String cvUrl) { this.cvUrl = cvUrl; }
     public String getSkills() { return skills; }
     public void setSkills(String skills) { this.skills = skills; }
+    public List<AvailabilitySlot> getAvailability() { return availability; }
+    public void setAvailability(List<AvailabilitySlot> availability) { this.availability = availability; }
 }

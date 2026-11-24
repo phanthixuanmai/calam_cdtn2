@@ -16,6 +16,10 @@ public class Application {
 
     private User student;
 
+    private String jobId;
+
+    private String studentId;
+
     private String cvUrl;
 
     private String coverLetter;
@@ -44,6 +48,10 @@ public class Application {
     public void setJob(Job job) { this.job = job; }
     public User getStudent() { return student; }
     public void setStudent(User student) { this.student = student; }
+    public String getJobId() { return jobId; }
+    public void setJobId(String jobId) { this.jobId = jobId; }
+    public String getStudentId() { return studentId; }
+    public void setStudentId(String studentId) { this.studentId = studentId; }
     public String getCvUrl() { return cvUrl; }
     public void setCvUrl(String cvUrl) { this.cvUrl = cvUrl; }
     public String getCoverLetter() { return coverLetter; }

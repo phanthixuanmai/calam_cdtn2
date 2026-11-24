@@ -1,7 +1,9 @@
 package com.freelance.marketplace.controller;
 
 import com.freelance.marketplace.dto.ApiResponse;
+import com.freelance.marketplace.dto.EmployerDashboardStats;
 import com.freelance.marketplace.dto.JobRequest;
+import com.freelance.marketplace.dto.WorkStageRequest;
 import com.freelance.marketplace.entity.Job;
 import com.freelance.marketplace.service.JobService;
 import jakarta.validation.Valid;
@@ -31,6 +33,29 @@ public class JobController {
         return ResponseEntity.ok(ApiResponse.success("Jobs retrieved successfully", jobService.getAllJobs(keyword, category, location, status)));
     }
 
+    @GetMapping("/jobs/my")
+    @PreAuthorize("hasAnyRole('EMPLOYER','ADMIN')")
+    public ResponseEntity<ApiResponse<List<Job>>> getMyJobs(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String status
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Jobs retrieved successfully",
+                jobService.getMyJobs(keyword, category, location, status)
+        ));
+    }
+
+    @GetMapping("/employer/dashboard")
+    @PreAuthorize("hasAnyRole('EMPLOYER','ADMIN')")
+    public ResponseEntity<ApiResponse<EmployerDashboardStats>> getEmployerDashboard() {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Employer dashboard stats loaded",
+                jobService.getEmployerDashboardStats()
+        ));
+    }
+
     @GetMapping("/jobs/{id}")
     public ResponseEntity<ApiResponse<Job>> getJobById(@PathVariable String id) {
         return ResponseEntity.ok(ApiResponse.success("Job retrieved successfully", jobService.getJobById(id)));
@@ -46,6 +71,21 @@ public class JobController {
     @PreAuthorize("hasAnyRole('EMPLOYER','ADMIN')")
     public ResponseEntity<ApiResponse<Job>> updateJob(@PathVariable String id, @Valid @RequestBody JobRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Job updated successfully", jobService.updateJob(id, request)));
+    }
+
+    @PutMapping("/jobs/{id}/close")
+    @PreAuthorize("hasAnyRole('EMPLOYER','ADMIN')")
+    public ResponseEntity<ApiResponse<Job>> closeJob(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success("Job closed successfully", jobService.closeJob(id)));
+    }
+
+    @PutMapping("/jobs/{id}/progress")
+    @PreAuthorize("hasAnyRole('EMPLOYER','ADMIN')")
+    public ResponseEntity<ApiResponse<Job>> advanceWorkStage(
+            @PathVariable String id,
+            @Valid @RequestBody WorkStageRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.success("Work progress updated successfully", jobService.advanceWorkStage(id, request.stage())));
     }
 
     @DeleteMapping("/jobs/{id}")

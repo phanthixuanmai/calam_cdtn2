@@ -32,7 +32,16 @@ export type Profile = {
   description?: string
   website?: string
   location?: string
+  availability?: AvailabilitySlot[]
 }
+
+export type AvailabilitySlot = {
+  day: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+  startTime: string
+  endTime: string
+}
+
+export type WorkStage = 'RECRUITING' | 'HIRED' | 'IN_PROGRESS' | 'COMPLETED'
 
 export type Job = {
   id: string
@@ -42,16 +51,34 @@ export type Job = {
   location?: string
   salaryRange?: string
   status: 'OPEN' | 'FILLED' | 'COMPLETED' | 'CLOSED'
+  workStage: WorkStage
+  workSchedule?: string
+  startDate?: string
+  endDate?: string
   employer?: { id: string; name: string; employerProfile?: { companyName?: string } }
 }
 
 export type Application = {
   id: string
   job: Job
-  student: Profile
+  student: Profile & {
+    studentProfile?: Pick<Profile, 'bio' | 'address' | 'skills' | 'cvUrl' | 'availability'>
+  }
   cvUrl?: string
   coverLetter: string
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED'
+}
+
+export type Review = {
+  id: string
+  applicationId: string
+  jobId: string
+  reviewerId: string
+  reviewer: Profile
+  reviewee: Profile
+  rating: number
+  comment?: string
+  targetType: Role
 }
 
 export type Notification = {
@@ -60,4 +87,15 @@ export type Notification = {
   content: string
   read: boolean
   createdAt?: string
+}
+
+export type EmployerDashboardStats = {
+  totalJobs: number
+  openJobs: number
+  closedJobs: number
+  totalApplications: number
+  pendingApplications: number
+  acceptedApplications: number
+  inProgressJobs: number
+  completedJobs: number
 }

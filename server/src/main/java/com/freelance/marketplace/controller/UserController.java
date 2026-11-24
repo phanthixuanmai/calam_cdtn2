@@ -4,6 +4,7 @@ import com.freelance.marketplace.dto.ApiResponse;
 import com.freelance.marketplace.dto.UpdateProfileRequest;
 import com.freelance.marketplace.entity.User;
 import com.freelance.marketplace.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class UserController {
 
     @PutMapping("/me")
     @PreAuthorize("hasAnyRole('STUDENT','EMPLOYER','ADMIN')")
-    public ResponseEntity<ApiResponse<User>> updateProfile(@RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<ApiResponse<User>> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", userService.updateProfile(request)));
     }
 }

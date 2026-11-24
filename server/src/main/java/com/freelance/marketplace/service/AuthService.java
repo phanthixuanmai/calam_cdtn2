@@ -9,6 +9,7 @@ import com.freelance.marketplace.entity.StudentProfile;
 import com.freelance.marketplace.entity.User;
 import com.freelance.marketplace.exception.BadRequestException;
 import com.freelance.marketplace.repository.UserRepository;
+import com.freelance.marketplace.util.AvailabilityMapper;
 import com.freelance.marketplace.util.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -70,6 +71,7 @@ public class AuthService {
             profile.setAddress("");
             profile.setCvUrl("");
             profile.setSkills("");
+            profile.setAvailability(AvailabilityMapper.toEntities(request.availability()));
             saved.setStudentProfile(profile);
         } else {
             EmployerProfile profile = new EmployerProfile();

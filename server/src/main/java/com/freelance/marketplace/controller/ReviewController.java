@@ -31,4 +31,10 @@ public class ReviewController {
     public ResponseEntity<ApiResponse<List<Review>>> getReviewsForUser(@PathVariable String userId) {
         return ResponseEntity.ok(ApiResponse.success("Reviews retrieved successfully", reviewService.getReviewsForUser(userId)));
     }
+
+    @GetMapping("/reviews/work/{applicationId}")
+    @PreAuthorize("hasAnyRole('STUDENT','EMPLOYER')")
+    public ResponseEntity<ApiResponse<List<Review>>> getReviewsForWork(@PathVariable String applicationId) {
+        return ResponseEntity.ok(ApiResponse.success("Reviews retrieved successfully", reviewService.getReviewsForWork(applicationId)));
+    }
 }

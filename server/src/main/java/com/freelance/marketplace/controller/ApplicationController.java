@@ -45,4 +45,10 @@ public class ApplicationController {
     public ResponseEntity<ApiResponse<Application>> updateStatus(@PathVariable String id, @Valid @RequestBody StatusUpdateRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Application status updated successfully", applicationService.updateApplicationStatus(id, request)));
     }
+
+    @PutMapping("/applications/{id}/cancel")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ApiResponse<Application>> cancelApplication(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success("Application cancelled successfully", applicationService.cancelApplication(id)));
+    }
 }

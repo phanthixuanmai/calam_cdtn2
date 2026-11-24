@@ -1,5 +1,9 @@
 package com.freelance.marketplace.dto;
 
+import jakarta.validation.Valid;
+
+import java.util.List;
+
 public record UpdateProfileRequest(
         String name,
         String phone,
@@ -10,6 +14,7 @@ public record UpdateProfileRequest(
         String website,
         String location,
         String skills,
-        String cvUrl
+        String cvUrl,
+        @Valid List<AvailabilitySlotRequest> availability
 ) {
 }

@@ -50,7 +50,7 @@ jwt.secret=${JWT_SECRET:change-this-secret-key-for-production}
 cd server
 .\run.ps1
 ```
-Script dùng Maven nếu đã cài; nếu chưa, script chạy JAR dựng sẵn trong `server/target`.
+Script dùng Maven nếu đã cài. Nếu chưa, script chỉ chạy JAR dựng sẵn khi JAR không cũ hơn source backend hiện tại; nếu source mới hơn, hãy cài Maven và chạy lại script để tránh khởi động API cũ.
 
 Backend chạy tại:
 - http://localhost:8080
@@ -82,12 +82,23 @@ Client admin chạy tại:
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `GET /api/jobs`
+- `GET /api/jobs/my` (tin của nhà tuyển dụng hiện tại)
 - `POST /api/jobs`
+- `PUT /api/jobs/{id}` (cập nhật tin của chủ sở hữu)
+- `PUT /api/jobs/{id}/close`
+- `PUT /api/jobs/{id}/progress`
 - `GET /api/jobs/{id}`
+- `GET /api/jobs/{jobId}/applications`
+- `PUT /api/applications/{id}/status`
 - `POST /api/applications`
 - `GET /api/applications/my`
+- `GET /api/users/me` / `PUT /api/users/me`
+- `POST /api/reviews` / `GET /api/reviews/work/{applicationId}`
 - `GET /api/notifications`
+- `PUT /api/notifications/{id}/read`
 - `GET /api/admin/users`
+
+Employer job-management and applicant endpoints require an authenticated employer account; the backend checks ownership before updates, closure, progress changes, and applicant-status changes. Admin routes remain separate.
 
 ## 10. Kiến trúc dự án
 ```text

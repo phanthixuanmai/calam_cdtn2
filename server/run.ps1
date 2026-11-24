@@ -30,9 +30,52 @@ if ([string]::IsNullOrWhiteSpace($mongoUri) -or $mongoUri -match '<[^>]+>' -or $
 
 $jarPath = Join-Path $PSScriptRoot 'target\marketplace-0.0.1-SNAPSHOT.jar'
 $maven = Get-Command mvn -ErrorAction SilentlyContinue
-if (-not $maven -and -not (Test-Path $jarPath)) {
-    Write-Error 'Maven is not installed and the prebuilt server JAR was not found.'
-    exit 1
+if (-not $maven) {
+    if (-not (Test-Path $jarPath)) {
+        Write-Error 'Maven is not installed and the prebuilt server JAR was not found.'
+        exit 1
+    }
+
+    $jarLastWriteTime = (Get-Item $jarPath).LastWriteTimeUtc
+    $sourceFiles = @()
+    $mainSourceDirectory = Join-Path $PSScriptRoot 'src\main'
+    if (Test-Path $mainSourceDirectory) {
+        $sourceFiles = @(Get-ChildItem -LiteralPath $mainSourceDirectory -Recurse -File)
+    }
+
+    $pomPath = Join-Path $PSScriptRoot 'pom.xml'
+    if (Test-Path $pomPath) {
+        $sourceFiles += Get-Item $pomPath
+    }
+
+    $javaSourceDirectory = Join-Path $PSScriptRoot 'src\main\java'
+    $classesDirectory = Join-Path $PSScriptRoot 'target\classes'
+    $staleCompiledSource = $null
+    if (-not (Test-Path $classesDirectory)) {
+        $staleCompiledSource = 'compiled classes are missing'
+    } elseif (Test-Path $javaSourceDirectory) {
+        foreach ($javaFile in (Get-ChildItem -LiteralPath $javaSourceDirectory -Recurse -Filter '*.java' -File)) {
+            $relativeSourcePath = $javaFile.FullName.Substring($javaSourceDirectory.Length).TrimStart('\')
+            $classPath = Join-Path $classesDirectory ([System.IO.Path]::ChangeExtension($relativeSourcePath, '.class'))
+            if (-not (Test-Path $classPath) -or $javaFile.LastWriteTimeUtc -gt (Get-Item $classPath).LastWriteTimeUtc) {
+                $staleCompiledSource = $javaFile.FullName
+                break
+            }
+        }
+    }
+
+    if ($staleCompiledSource) {
+        Write-Error "The prebuilt server JAR cannot be verified against current source ($staleCompiledSource). Install Maven and rebuild before starting the backend."
+        exit 1
+    }
+
+    $newerSourceFile = $sourceFiles |
+        Where-Object { $_.LastWriteTimeUtc -gt $jarLastWriteTime } |
+        Select-Object -First 1
+    if ($newerSourceFile) {
+        Write-Error "The prebuilt server JAR is older than source file '$($newerSourceFile.FullName)'. Install Maven and run this script to start the current source instead of stale routes."
+        exit 1
+    }
 }
 
 $previousMongoUri = $env:MONGODB_URI
@@ -45,6 +88,7 @@ try {
     if ($maven) {
         & mvn spring-boot:run
     } else {
+        Write-Warning 'Maven is unavailable; starting the prebuilt server JAR because it is not older than the current source.'
         & java -jar '.\target\marketplace-0.0.1-SNAPSHOT.jar'
     }
     $exitCode = $LASTEXITCODE
